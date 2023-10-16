@@ -5,7 +5,7 @@ import math
 from random import choices
 
 n = 7
-alpha = 1.1
+alpha = 1
 beta = 4
 Q = 2.4
 p = 0.8
@@ -33,21 +33,23 @@ for i in range(0, n):
         else:
             G.add_edge(i, j, weight=int(distance_matrix[i][j] * 100))
             # G.add_edge(i, j)
-            distance_matrix[j][i] = None
+            distance_matrix[j][i] = 0
 
 for i in range(0, n):
     for j in range(i, n):
         if i != j:
             feromon_matrix[i][j] = t0
-        feromon_matrix[j][i] = None
+        feromon_matrix[j][i] = 0
 
 
 def draw_graph(n, feromon_matrix):
     edge_widths = []
 
+    max_feromon_value = 10 / np.max(feromon_matrix)
+
     for i in range(n - 1):
         for j in range(i + 1, n):
-            edge_widths.append(min(feromon_matrix[i][j], 15))
+            edge_widths.append(feromon_matrix[i][j] * max_feromon_value)
 
     nx.draw(G, pos, with_labels=True, node_size=500, node_color="lightblue", font_size=10,
             width=edge_widths, font_color="black", font_weight="bold", font_family="sans-serif",
@@ -68,7 +70,7 @@ def next_point_choise(actual_point, available_points):
 
     for point in available_points_list:
         pos1, pos2 = sorted([point, actual_point])
-        probabilities_list.append(feromon_matrix[pos1][pos2] ** alpha / distance_matrix[pos1][pos2] ** beta)
+        probabilities_list.append((feromon_matrix[pos1][pos2] ** alpha) / (distance_matrix[pos1][pos2] ** beta))
 
     return choices(available_points_list, weights=probabilities_list)[0]
 
@@ -107,4 +109,3 @@ while True:
 
 plt.ioff()
 plt.show()
-
