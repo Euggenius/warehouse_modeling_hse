@@ -1,0 +1,68 @@
+import simpy
+
+
+class Robot:
+    def __init__(self, env, cl, num=1, x=0, y=0, dir='north'):
+        self.env = env
+        self.action = env.process(self.run())
+        self.x = x
+        self.y = y
+        self.direction = dir
+        self.commands = cl
+        self.robot_number = num
+
+    def run(self):
+        for command in commands:
+            self.do_command(command)
+            yield self.env.timeout(1)  # Симуляция времени в секундах
+
+    def move_forward(self, distance):
+        if self.direction == "north":
+            self.y += distance
+        elif self.direction == "south":
+            self.y -= distance
+        elif self.direction == "east":
+            self.x += distance
+        elif self.direction == "west":
+            self.x -= distance
+
+    def turn_right(self, angle):
+        dir = ['north', 'east', 'south', 'west']
+        self.direction = dir[(dir.index(self.direction) + angle // 90) % 4]
+
+    def turn_left(self, angle):
+        dir = ['north', 'east', 'south', 'west']
+        self.direction = dir[(dir.index(self.direction) - angle // 90) % 4]
+
+    def do_command(self, command):
+        command = command.split()
+        if command[0] == 'N':
+            print(f'Robot {self.robot_number} do nothing')
+        elif command[0] == 'M':
+            self.move_forward(int(command[1]))
+            print(f'Robot {self.robot_number} moved for {command[1]} cells')
+        elif command[0] == 'TR':
+            self.turn_right(int(command[1]))
+            print(f'Robot {self.robot_number} turned right for {command[1]} grad')
+        elif command[0] == 'TL':
+            self.turn_left(int(command[1]))
+            print(f'Robot {self.robot_number} turned left for {command[1]} grad')
+        elif command[0] == 'G':
+            self.get_robot_parameters()
+        else:
+            print('Command error')
+
+    def get_robot_parameters(self):
+        print(f"Robot {self.robot_number} is at position ({self.x}, {self.y}) facing {self.direction}")
+
+
+commands = ['N', 'N', 'M 1', 'TR 90', 'M 10', 'G']
+
+# Создаем окружение SimPy
+env = simpy.Environment()
+
+# Создаем робота
+robot = Robot(env, commands)
+
+# Запускаем симуляцию
+env.run()  # Запускаем симуляцию на 10 секунд
